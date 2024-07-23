@@ -1,4 +1,4 @@
-import { verifySignature, verifyTokenAsync } from "../lib/jwt";
+import { verifySignature, verifyTokenAsync } from "../jwt";
 import { NextRequest, NextResponse } from "next/server";
 
 export const apiMidleware = async (request: NextRequest) => {

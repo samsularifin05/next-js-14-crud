@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { apiMidleware } from "./midleware/api-midleware";
+import { apiMidleware } from "./lib/midleware/api-midleware";
 
 // Middleware function
 export function middleware(request: NextRequest) {
