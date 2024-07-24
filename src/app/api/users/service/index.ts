@@ -1,4 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
+"use server";
+
 import { generate, validateSchema } from "@/lib";
 import UserRepository from "../repository";
 import { CreateUserRequestDto } from "../dto/create-users-request.dto";

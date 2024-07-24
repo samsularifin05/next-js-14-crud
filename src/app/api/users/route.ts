@@ -1,5 +1,4 @@
-// // src/app/api/users/route.ts
-
+"use server";
 import { ResponseDto } from "@/lib";
 import UserService from "./service";
 import { mapUsers } from "./dto/user-response.dto";

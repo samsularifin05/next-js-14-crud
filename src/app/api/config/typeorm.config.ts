@@ -8,7 +8,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const isPostgres = process.env.DATABASE_PROVIDER === "postgres";
-
+const isProduction = process.env.NODE_ENV === "production";
 export const AppDataSource = new DataSource({
   type: isPostgres ? "postgres" : "mysql",
   host: process.env.DATABASE_HOST,
@@ -17,5 +17,5 @@ export const AppDataSource = new DataSource({
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
   entities: [User],
-  synchronize: true // Set to false in production
+  synchronize: !isProduction // Set to false in production
 });
