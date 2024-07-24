@@ -3,8 +3,8 @@ import { sha256 } from "js-sha256";
 
 // Replace with your actual secret
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
-const APP_KEY = process.env.APP_KEY;
-const SECRETKEY = process.env.SECRETKEY;
+const APP_KEY = process.env.API_KEY;
+const SECRETKEY = process.env.SECRET_KEY;
 
 // Function to create a token
 export async function generateToken(payload: object): Promise<string> {
@@ -38,20 +38,40 @@ export async function verifyTokenAsync(token: string) {
   }
 }
 
-export const generateSignature = (token: string = ""): string => {
-  const key = `${APP_KEY}${SECRETKEY}`;
-  const data = token;
-  const signature = sha256.hmac(data, key);
+export const computeSignature = (
+  apiKey: string,
+  secretKey: string,
+  accessToken: string,
+  timestamp: string
+) => {
+  const payload = apiKey + secretKey + accessToken + timestamp;
+  const signature = sha256.hmac(secretKey, payload);
   return signature;
 };
 
 export async function verifySignature(
-  token: string,
-  receivedSignature: string
+  signature: string,
+  timestamp: string,
+  accessToken: string,
+  tolerance: number
 ): Promise<boolean> {
   try {
-    const expectedSignature = generateSignature(token);
-    return receivedSignature === expectedSignature;
+    const headerDate = new Date(timestamp);
+    const currentDate = new Date();
+    const diffDateSecond =
+      (currentDate.getTime() - headerDate.getTime()) / 1000;
+
+    if (diffDateSecond < -tolerance || diffDateSecond > tolerance) {
+      return false;
+    }
+    const expectedSignature = computeSignature(
+      `${APP_KEY}`,
+      `${SECRETKEY}`,
+      accessToken,
+      timestamp
+    );
+
+    return signature === expectedSignature;
   } catch (error) {
     console.error("Token verification failed:", error);
     throw new Error("Invalid token " + error);

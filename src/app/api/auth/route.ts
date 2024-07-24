@@ -1,23 +1,13 @@
-import { generateSignature, ResponseDto, verifySignature } from "@/lib";
-import { generateToken, verifyToken } from "@/lib";
+import { ResponseDto } from "@/lib";
+import LoginService from "./service";
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   try {
-    const payload = { userId: 123, email: "user@example.com" };
+    const body = await request.json();
 
-    // Generate a token
-    const token = await generateToken(payload);
-    const timestamp = new Date().toISOString();
-    const signature = generateSignature(token);
+    let result = await LoginService.cekLogin(body);
 
-    const decodedPayload = await verifyToken(token);
-    const isSignature = await verifySignature(token, signature);
-    return ResponseDto("Data Tersedia ", 200, {
-      ...decodedPayload,
-      token: token,
-      signature: signature,
-      isSignature: isSignature
-    });
+    return ResponseDto("Data Tersedia", 200, result);
   } catch (error) {
     return ResponseDto(`${error}`, 500);
   }

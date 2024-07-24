@@ -1,22 +1,14 @@
 import { getId, ResponseDto } from "@/lib";
 import UserService from "../service";
+import { mapUsers } from "../dto/user-response.dto";
 
 export async function PUT(request: Request) {
   try {
     const id = getId(request);
-    const { name, email } = await request.json();
-
-    if (!id) {
-      return ResponseDto(`Id Notefound`, 400);
-    }
-
-    const existingUser = await UserService.getUserById(id);
-
-    if (!existingUser) {
-      return ResponseDto("Usernote found", 400);
-    }
-    const updatedUser = await UserService.updateUser(id, { name, email });
-    return ResponseDto("Data Berhasil di edit", 200, updatedUser);
+    const data = await request.json();
+    const updatedUser = await UserService.updateUser(id, data);
+    const mappedUsers = mapUsers(updatedUser);
+    return ResponseDto("Data Berhasil di edit", 200, mappedUsers);
   } catch (error) {
     return ResponseDto(`${error}`, 500);
   }
@@ -24,16 +16,8 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const id = getId(request);
-    if (!id) {
-      return ResponseDto(`Id Notefound`, 400);
-    }
-
     await UserService.deleteUser(Number(id));
-
-    return new Response("Berhasil di hapus", {
-      headers: { "Content-Type": "application/json" },
-      status: 200
-    });
+    return ResponseDto("Data Berhasil di hapus", 200);
   } catch (error) {
     return ResponseDto(`${error}`, 500);
   }
@@ -42,12 +26,9 @@ export async function DELETE(request: Request) {
 export async function GET(request: Request) {
   try {
     const id = getId(request);
-    if (id) {
-      const users = await UserService.getUserById(id);
-      return ResponseDto("Data Tersedia", 200, users);
-    }
-    const users = await UserService.getAllUsers();
-    return ResponseDto("Data Tersedia", 200, users);
+    const users = await UserService.getUserById(id);
+    const mappedUsers = mapUsers(users);
+    return ResponseDto("Data Tersedia", 200, mappedUsers);
   } catch (error) {
     return ResponseDto(`${error}`, 500);
   }

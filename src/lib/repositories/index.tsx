@@ -1,7 +1,13 @@
 // src/lib/repositories/BaseRepo.ts
 
-import { AppDataSource } from "@/app/api/db/typeorm.config";
-import { DataSource, DeepPartial, ObjectLiteral, Repository } from "typeorm";
+import { AppDataSource } from "@/app/api/config/typeorm.config";
+import {
+  DataSource,
+  DeepPartial,
+  FindOptionsWhere,
+  ObjectLiteral,
+  Repository
+} from "typeorm";
 
 class BaseRepository<T extends ObjectLiteral> {
   private repository: Repository<T>;
@@ -42,6 +48,13 @@ class BaseRepository<T extends ObjectLiteral> {
     }
     Object.assign(entity, data);
     return this.repository.save(entity);
+  }
+
+  async findOne(query: FindOptionsWhere<T>): Promise<T | null> {
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
+    }
+    return (await this.repository.findOne({ where: query })) || null;
   }
 
   async delete(id: number): Promise<void> {
